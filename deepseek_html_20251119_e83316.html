@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Downloader | Download Your Favorite Tracks</title>
+    <style>
+        :root {
+            --primary-color: #1DB954;
+            --primary-dark: #1ed760;
+            --dark-bg: #191414;
+            --light-bg: #f8f9fa;
+            --text-light: #ffffff;
+            --text-dark: #191414;
+            --card-bg: #282828;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            flex: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--dark-bg);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #b3b3b3;
+            font-size: 1.1rem;
+        }
+
+        .input-section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px var(--primary-color);
+        }
+
+        button {
+            padding: 1rem 1.5rem;
+            background-color: var(--primary-color);
+            color: var(--text-dark);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #535353;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-light);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .song-info {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .album-cover {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .song-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .song-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .artist {
+            color: #b3b3b3;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .download-btn {
+            align-self: flex-start;
+            text-decoration: none;
+        }
+
+        .error-message {
+            display: none;
+            background-color: #e22134;
+            color: var(--text-light);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #b3b3b3;
+            font-size: 0.9rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            margin-top: auto;
+        }
+
+        @media (max-width: 600px) {
+            .song-info {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .album-cover {
+                align-self: center;
+            }
+            
+            .download-btn {
+                align-self: center;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-2-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                    </svg>
+                </div>
+                <h1>Spotify Downloader</h1>
+            </div>
+            <p class="subtitle">Download your favorite Spotify tracks easily and quickly</p>
+        </header>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="spotifyUrl" placeholder="Paste Spotify song URL here...">
+                <button id="fetchBtn">
+                    <span>Download</span>
+                    <div class="loader" id="loader"></div>
+                </button>
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage">
+            Error: Unable to fetch song information. Please check the URL and try again.
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="song-info">
+                <img id="coverImage" class="album-cover" src="" alt="Album Cover">
+                <div class="song-details">
+                    <h2 class="song-title" id="songTitle"></h2>
+                    <p class="artist" id="artistName"></p>
+                    <a href="#" id="downloadLink" class="download-btn" target="_blank">
+                        <button>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 16L12 4M12 16L8 12M12 16L16 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 20H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            Download MP3
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>This service is for personal use only. Please respect artists' rights and support them by purchasing their music.</p>
+        <p>&copy; 2023 Spotify Downloader</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const spotifyUrlInput = document.getElementById('spotifyUrl');
+            const fetchBtn = document.getElementById('fetchBtn');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultSection = document.getElementById('resultSection');
+            const songTitle = document.getElementById('songTitle');
+            const artistName = document.getElementById('artistName');
+            const coverImage = document.getElementById('coverImage');
+            const downloadLink = document.getElementById('downloadLink');
+            
+            fetchBtn.addEventListener('click', fetchSongInfo);
+            
+            function fetchSongInfo() {
+                const url = spotifyUrlInput.value.trim();
+                
+                if (!url) {
+                    showError('Please enter a Spotify URL');
+                    return;
+                }
+                
+                // Show loading state
+                fetchBtn.disabled = true;
+                loader.style.display = 'block';
+                errorMessage.style.display = 'none';
+                resultSection.style.display = 'none';
+                
+                // Make API request
+                const apiUrl = `https://api.ccprojectsapis-jonell.gleeze.com/api/spotify?url=${encodeURIComponent(url)}`;
+                
+                fetch(apiUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Update UI with song data
+                        songTitle.textContent = data.songTitle;
+                        artistName.textContent = data.artist;
+                        coverImage.src = data.coverImage;
+                        downloadLink.href = data.mp3DownloadLink;
+                        
+                        // Show result section
+                        resultSection.style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showError('Unable to fetch song information. Please check the URL and try again.');
+                    })
+                    .finally(() => {
+                        // Reset loading state
+                        fetchBtn.disabled = false;
+                        loader.style.display = 'none';
+                    });
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
